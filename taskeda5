@@ -1,0 +1,1258 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "id": "sPmFhamrllMY"
+      },
+      "outputs": [],
+      "source": [
+        "import pandas as pd\n",
+        "import matplotlib.pyplot as plt\n",
+        "import numpy as np\n",
+        "import seaborn as sns"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df=pd.read_csv(\"/content/healthcare_data_for_task - healthcare_data_for_task.csv\")"
+      ],
+      "metadata": {
+        "id": "_CLEf2SUmMrF"
+      },
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 226
+        },
+        "id": "WtbfhrmhmacQ",
+        "outputId": "647e1e41-f1a2-4216-c989-5dac2509a8ae"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "  Patient_ID  Age  Gender Blood_Type Medical_Condition Medical_Code  \\\n",
+              "0      P0001   47    Male        AB+     Heart Disease       HEA004   \n",
+              "1      P0002   62  Female        AB-          Diabetes       DIA001   \n",
+              "2      P0003   36    Male        AB-     Heart Disease       HEA004   \n",
+              "3      P0004   51    Male         A+     Heart Disease       HEA004   \n",
+              "4      P0005   30    Male         A+          Diabetes       DIA001   \n",
+              "\n",
+              "  Date_of_Admission Discharge_Date Admission_Type  Billing_Amount  \n",
+              "0        2025-05-10     2025-05-16      Emergency        23218.31  \n",
+              "1        2025-12-31     2026-01-02      Emergency        47010.56  \n",
+              "2        2025-11-10     2025-11-27      Emergency        39619.01  \n",
+              "3        2023-05-02     2023-05-07       Elective        35963.71  \n",
+              "4        2024-04-11     2024-04-17         Urgent        64615.93  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-8c5318d7-ff77-4b04-84fc-1fa84e670ee7\" class=\"colab-df-container\">\n",
+              "    <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Patient_ID</th>\n",
+              "      <th>Age</th>\n",
+              "      <th>Gender</th>\n",
+              "      <th>Blood_Type</th>\n",
+              "      <th>Medical_Condition</th>\n",
+              "      <th>Medical_Code</th>\n",
+              "      <th>Date_of_Admission</th>\n",
+              "      <th>Discharge_Date</th>\n",
+              "      <th>Admission_Type</th>\n",
+              "      <th>Billing_Amount</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>P0001</td>\n",
+              "      <td>47</td>\n",
+              "      <td>Male</td>\n",
+              "      <td>AB+</td>\n",
+              "      <td>Heart Disease</td>\n",
+              "      <td>HEA004</td>\n",
+              "      <td>2025-05-10</td>\n",
+              "      <td>2025-05-16</td>\n",
+              "      <td>Emergency</td>\n",
+              "      <td>23218.31</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>P0002</td>\n",
+              "      <td>62</td>\n",
+              "      <td>Female</td>\n",
+              "      <td>AB-</td>\n",
+              "      <td>Diabetes</td>\n",
+              "      <td>DIA001</td>\n",
+              "      <td>2025-12-31</td>\n",
+              "      <td>2026-01-02</td>\n",
+              "      <td>Emergency</td>\n",
+              "      <td>47010.56</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>P0003</td>\n",
+              "      <td>36</td>\n",
+              "      <td>Male</td>\n",
+              "      <td>AB-</td>\n",
+              "      <td>Heart Disease</td>\n",
+              "      <td>HEA004</td>\n",
+              "      <td>2025-11-10</td>\n",
+              "      <td>2025-11-27</td>\n",
+              "      <td>Emergency</td>\n",
+              "      <td>39619.01</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>P0004</td>\n",
+              "      <td>51</td>\n",
+              "      <td>Male</td>\n",
+              "      <td>A+</td>\n",
+              "      <td>Heart Disease</td>\n",
+              "      <td>HEA004</td>\n",
+              "      <td>2023-05-02</td>\n",
+              "      <td>2023-05-07</td>\n",
+              "      <td>Elective</td>\n",
+              "      <td>35963.71</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>P0005</td>\n",
+              "      <td>30</td>\n",
+              "      <td>Male</td>\n",
+              "      <td>A+</td>\n",
+              "      <td>Diabetes</td>\n",
+              "      <td>DIA001</td>\n",
+              "      <td>2024-04-11</td>\n",
+              "      <td>2024-04-17</td>\n",
+              "      <td>Urgent</td>\n",
+              "      <td>64615.93</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "    <div class=\"colab-df-buttons\">\n",
+              "\n",
+              "  <div class=\"colab-df-container\">\n",
+              "    <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-8c5318d7-ff77-4b04-84fc-1fa84e670ee7')\"\n",
+              "            title=\"Convert this dataframe to an interactive table.\"\n",
+              "            style=\"display:none;\">\n",
+              "\n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\">\n",
+              "    <path d=\"M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z\"/>\n",
+              "  </svg>\n",
+              "    </button>\n",
+              "\n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-buttons div {\n",
+              "      margin-bottom: 4px;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "    <script>\n",
+              "      const buttonEl =\n",
+              "        document.querySelector('#df-8c5318d7-ff77-4b04-84fc-1fa84e670ee7 button.colab-df-convert');\n",
+              "      buttonEl.style.display =\n",
+              "        google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "      async function convertToInteractive(key) {\n",
+              "        const element = document.querySelector('#df-8c5318d7-ff77-4b04-84fc-1fa84e670ee7');\n",
+              "        const dataTable =\n",
+              "          await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                    [key], {});\n",
+              "        if (!dataTable) return;\n",
+              "\n",
+              "        const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "          '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "          + ' to learn more about interactive tables.';\n",
+              "        element.innerHTML = '';\n",
+              "        dataTable['output_type'] = 'display_data';\n",
+              "        await google.colab.output.renderOutput(dataTable, element);\n",
+              "        const docLink = document.createElement('div');\n",
+              "        docLink.innerHTML = docLinkHtml;\n",
+              "        element.appendChild(docLink);\n",
+              "      }\n",
+              "    </script>\n",
+              "  </div>\n",
+              "\n",
+              "\n",
+              "    </div>\n",
+              "  </div>\n"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "dataframe",
+              "variable_name": "df",
+              "summary": "{\n  \"name\": \"df\",\n  \"rows\": 1000,\n  \"fields\": [\n    {\n      \"column\": \"Patient_ID\",\n      \"properties\": {\n        \"dtype\": \"string\",\n        \"num_unique_values\": 1000,\n        \"samples\": [\n          \"P0522\",\n          \"P0738\",\n          \"P0741\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Age\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 19,\n        \"min\": 18,\n        \"max\": 85,\n        \"num_unique_values\": 68,\n        \"samples\": [\n          44,\n          67,\n          30\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Gender\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 2,\n        \"samples\": [\n          \"Female\",\n          \"Male\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Blood_Type\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 8,\n        \"samples\": [\n          \"AB-\",\n          \"O+\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Medical_Condition\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 5,\n        \"samples\": [\n          \"Diabetes\",\n          \"Asthma\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Medical_Code\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 5,\n        \"samples\": [\n          \"DIA001\",\n          \"AST003\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Date_of_Admission\",\n      \"properties\": {\n        \"dtype\": \"object\",\n        \"num_unique_values\": 661,\n        \"samples\": [\n          \"2025-02-16\",\n          \"2024-01-05\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Discharge_Date\",\n      \"properties\": {\n        \"dtype\": \"object\",\n        \"num_unique_values\": 641,\n        \"samples\": [\n          \"2025-02-28\",\n          \"2025-02-15\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Admission_Type\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 9,\n        \"samples\": [\n          \"emergency\",\n          \"Elective\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Billing_Amount\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 41955.242269347975,\n        \"min\": 5568.16,\n        \"max\": 149921.8,\n        \"num_unique_values\": 1000,\n        \"samples\": [\n          119740.05,\n          119265.1\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    }\n  ]\n}"
+            }
+          },
+          "metadata": {},
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.info()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "NypbgKuJmhGk",
+        "outputId": "10b2a01a-1b2b-46af-c721-93d4a16a17d1"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "<class 'pandas.core.frame.DataFrame'>\n",
+            "RangeIndex: 1000 entries, 0 to 999\n",
+            "Data columns (total 10 columns):\n",
+            " #   Column             Non-Null Count  Dtype  \n",
+            "---  ------             --------------  -----  \n",
+            " 0   Patient_ID         1000 non-null   object \n",
+            " 1   Age                1000 non-null   int64  \n",
+            " 2   Gender             1000 non-null   object \n",
+            " 3   Blood_Type         1000 non-null   object \n",
+            " 4   Medical_Condition  1000 non-null   object \n",
+            " 5   Medical_Code       970 non-null    object \n",
+            " 6   Date_of_Admission  1000 non-null   object \n",
+            " 7   Discharge_Date     1000 non-null   object \n",
+            " 8   Admission_Type     1000 non-null   object \n",
+            " 9   Billing_Amount     1000 non-null   float64\n",
+            "dtypes: float64(1), int64(1), object(8)\n",
+            "memory usage: 78.3+ KB\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.shape"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "kOSs8uMimjGf",
+        "outputId": "1a6a148b-4227-48ca-88e5-33a09dda2667"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(1000, 10)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.describe()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 300
+        },
+        "id": "dokwlykRmm1F",
+        "outputId": "5c84539f-00af-4284-91e2-0ebc1e768938"
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "               Age  Billing_Amount\n",
+              "count  1000.000000     1000.000000\n",
+              "mean     51.888000    77117.515720\n",
+              "std      19.256954    41955.242269\n",
+              "min      18.000000     5568.160000\n",
+              "25%      35.750000    40318.785000\n",
+              "50%      52.000000    77293.900000\n",
+              "75%      69.000000   113089.267500\n",
+              "max      85.000000   149921.800000"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-67ccbe70-e956-49d6-b7ef-89e15ed26cc9\" class=\"colab-df-container\">\n",
+              "    <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Age</th>\n",
+              "      <th>Billing_Amount</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>count</th>\n",
+              "      <td>1000.000000</td>\n",
+              "      <td>1000.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>mean</th>\n",
+              "      <td>51.888000</td>\n",
+              "      <td>77117.515720</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>std</th>\n",
+              "      <td>19.256954</td>\n",
+              "      <td>41955.242269</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>min</th>\n",
+              "      <td>18.000000</td>\n",
+              "      <td>5568.160000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>25%</th>\n",
+              "      <td>35.750000</td>\n",
+              "      <td>40318.785000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>50%</th>\n",
+              "      <td>52.000000</td>\n",
+              "      <td>77293.900000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>75%</th>\n",
+              "      <td>69.000000</td>\n",
+              "      <td>113089.267500</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>max</th>\n",
+              "      <td>85.000000</td>\n",
+              "      <td>149921.800000</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "    <div class=\"colab-df-buttons\">\n",
+              "\n",
+              "  <div class=\"colab-df-container\">\n",
+              "    <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-67ccbe70-e956-49d6-b7ef-89e15ed26cc9')\"\n",
+              "            title=\"Convert this dataframe to an interactive table.\"\n",
+              "            style=\"display:none;\">\n",
+              "\n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\">\n",
+              "    <path d=\"M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z\"/>\n",
+              "  </svg>\n",
+              "    </button>\n",
+              "\n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-buttons div {\n",
+              "      margin-bottom: 4px;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "    <script>\n",
+              "      const buttonEl =\n",
+              "        document.querySelector('#df-67ccbe70-e956-49d6-b7ef-89e15ed26cc9 button.colab-df-convert');\n",
+              "      buttonEl.style.display =\n",
+              "        google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "      async function convertToInteractive(key) {\n",
+              "        const element = document.querySelector('#df-67ccbe70-e956-49d6-b7ef-89e15ed26cc9');\n",
+              "        const dataTable =\n",
+              "          await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                    [key], {});\n",
+              "        if (!dataTable) return;\n",
+              "\n",
+              "        const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "          '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "          + ' to learn more about interactive tables.';\n",
+              "        element.innerHTML = '';\n",
+              "        dataTable['output_type'] = 'display_data';\n",
+              "        await google.colab.output.renderOutput(dataTable, element);\n",
+              "        const docLink = document.createElement('div');\n",
+              "        docLink.innerHTML = docLinkHtml;\n",
+              "        element.appendChild(docLink);\n",
+              "      }\n",
+              "    </script>\n",
+              "  </div>\n",
+              "\n",
+              "\n",
+              "    </div>\n",
+              "  </div>\n"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "dataframe",
+              "summary": "{\n  \"name\": \"df\",\n  \"rows\": 8,\n  \"fields\": [\n    {\n      \"column\": \"Age\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 337.6272426657039,\n        \"min\": 18.0,\n        \"max\": 1000.0,\n        \"num_unique_values\": 8,\n        \"samples\": [\n          51.888,\n          52.0,\n          1000.0\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Billing_Amount\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 51501.80074146021,\n        \"min\": 1000.0,\n        \"max\": 149921.8,\n        \"num_unique_values\": 8,\n        \"samples\": [\n          77117.51572,\n          77293.9,\n          1000.0\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    }\n  ]\n}"
+            }
+          },
+          "metadata": {},
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "df[\"Medical_Code\"]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 458
+        },
+        "id": "Bc4idUmFm_Zv",
+        "outputId": "7c02af05-d090-4b10-9e6e-0c7488b1f6ba"
+      },
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0      HEA004\n",
+              "1      DIA001\n",
+              "2      HEA004\n",
+              "3      HEA004\n",
+              "4      DIA001\n",
+              "        ...  \n",
+              "995    DIA001\n",
+              "996    DIA001\n",
+              "997    DIA001\n",
+              "998    DIA001\n",
+              "999    AST003\n",
+              "Name: Medical_Code, Length: 1000, dtype: object"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Medical_Code</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>HEA004</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>DIA001</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>HEA004</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>HEA004</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>DIA001</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>995</th>\n",
+              "      <td>DIA001</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>996</th>\n",
+              "      <td>DIA001</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>997</th>\n",
+              "      <td>DIA001</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>998</th>\n",
+              "      <td>DIA001</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>999</th>\n",
+              "      <td>AST003</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>1000 rows × 1 columns</p>\n",
+              "</div><br><label><b>dtype:</b> object</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 8
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.isnull().sum()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 397
+        },
+        "id": "QMEJpLMjnLfc",
+        "outputId": "a92cf284-321b-4367-fe8b-a74846187b03"
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Patient_ID            0\n",
+              "Age                   0\n",
+              "Gender                0\n",
+              "Blood_Type            0\n",
+              "Medical_Condition     0\n",
+              "Medical_Code         30\n",
+              "Date_of_Admission     0\n",
+              "Discharge_Date        0\n",
+              "Admission_Type        0\n",
+              "Billing_Amount        0\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>Patient_ID</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Age</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Gender</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Blood_Type</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Medical_Condition</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Medical_Code</th>\n",
+              "      <td>30</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Date_of_Admission</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Discharge_Date</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Admission_Type</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Billing_Amount</th>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 9
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df[\"Medical_Code\"]=df[\"Medical_Code\"].fillna(\"Unknown\")"
+      ],
+      "metadata": {
+        "id": "-I1aAzTtoFu3"
+      },
+      "execution_count": 10,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Admission_Type']=(\n",
+        "    df['Admission_Type']\n",
+        "   .str.strip()\n",
+        "   .str.title()\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "dl71T4rdou6C"
+      },
+      "execution_count": 11,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Admission_Type'].unique()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ERJLfhmcrVgw",
+        "outputId": "26897fcd-c8e9-4d1d-97ab-e9253f40a36a"
+      },
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array(['Emergency', 'Elective', 'Urgent'], dtype=object)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Admission_Type'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 209
+        },
+        "id": "RMe0WTcSsJli",
+        "outputId": "b53f95f6-fd0d-4dec-cfa3-e04c67bc51a3"
+      },
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Admission_Type\n",
+              "Emergency    381\n",
+              "Elective     368\n",
+              "Urgent       251\n",
+              "Name: count, dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>count</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Admission_Type</th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>Emergency</th>\n",
+              "      <td>381</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Elective</th>\n",
+              "      <td>368</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Urgent</th>\n",
+              "      <td>251</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 13
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Date_of_Admission']=pd.to_datetime(df['Date_of_Admission'])"
+      ],
+      "metadata": {
+        "id": "uSOvixtoriX5"
+      },
+      "execution_count": 14,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Discharge_Date']=pd.to_datetime(df['Discharge_Date'])"
+      ],
+      "metadata": {
+        "id": "PGY4QxHar55t"
+      },
+      "execution_count": 15,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Date_of_Admission'].dt.year"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 458
+        },
+        "id": "zaQMIJ-TsYmx",
+        "outputId": "42b5e94d-920c-4989-acb3-73f094da1d9f"
+      },
+      "execution_count": 16,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0      2025\n",
+              "1      2025\n",
+              "2      2025\n",
+              "3      2023\n",
+              "4      2024\n",
+              "       ... \n",
+              "995    2023\n",
+              "996    2025\n",
+              "997    2023\n",
+              "998    2023\n",
+              "999    2023\n",
+              "Name: Date_of_Admission, Length: 1000, dtype: int32"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Date_of_Admission</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>2025</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>2025</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>2025</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>2023</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>2024</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>995</th>\n",
+              "      <td>2023</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>996</th>\n",
+              "      <td>2025</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>997</th>\n",
+              "      <td>2023</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>998</th>\n",
+              "      <td>2023</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>999</th>\n",
+              "      <td>2023</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>1000 rows × 1 columns</p>\n",
+              "</div><br><label><b>dtype:</b> int32</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Date_of_Admission'].dt.month"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 458
+        },
+        "id": "lO8P9xy5smnP",
+        "outputId": "241936a1-5cab-47bc-e306-fa79b766ebb5"
+      },
+      "execution_count": 17,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0       5\n",
+              "1      12\n",
+              "2      11\n",
+              "3       5\n",
+              "4       4\n",
+              "       ..\n",
+              "995     3\n",
+              "996     4\n",
+              "997     5\n",
+              "998     2\n",
+              "999     2\n",
+              "Name: Date_of_Admission, Length: 1000, dtype: int32"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Date_of_Admission</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>5</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>12</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>11</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>5</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>4</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>995</th>\n",
+              "      <td>3</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>996</th>\n",
+              "      <td>4</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>997</th>\n",
+              "      <td>5</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>998</th>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>999</th>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>1000 rows × 1 columns</p>\n",
+              "</div><br><label><b>dtype:</b> int32</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 17
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Date_of_Admission'].dt.day"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 458
+        },
+        "id": "ZwRNRk_hsroS",
+        "outputId": "71a57b95-8d25-4324-e5ec-348e61b9b78d"
+      },
+      "execution_count": 18,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0      10\n",
+              "1      31\n",
+              "2      10\n",
+              "3       2\n",
+              "4      11\n",
+              "       ..\n",
+              "995    16\n",
+              "996    17\n",
+              "997     8\n",
+              "998    11\n",
+              "999    10\n",
+              "Name: Date_of_Admission, Length: 1000, dtype: int32"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Date_of_Admission</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>10</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>31</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>10</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>11</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>995</th>\n",
+              "      <td>16</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>996</th>\n",
+              "      <td>17</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>997</th>\n",
+              "      <td>8</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>998</th>\n",
+              "      <td>11</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>999</th>\n",
+              "      <td>10</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>1000 rows × 1 columns</p>\n",
+              "</div><br><label><b>dtype:</b> int32</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 18
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "gl3TgZLAUpdE"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pd.crosstab(\n",
+        "    df['Medical_Condition']\n",
+        "    df.['Gender']\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "yURss095teLh",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 106
+        },
+        "outputId": "35a82b46-c941-4693-8abf-ede386bc8223"
+      },
+      "execution_count": 19,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "SyntaxError",
+          "evalue": "invalid syntax. Perhaps you forgot a comma? (3387373577.py, line 2)",
+          "traceback": [
+            "\u001b[0;36m  File \u001b[0;32m\"/tmp/ipykernel_2556/3387373577.py\"\u001b[0;36m, line \u001b[0;32m2\u001b[0m\n\u001b[0;31m    df['Medical_Condition']\u001b[0m\n\u001b[0m    ^\u001b[0m\n\u001b[0;31mSyntaxError\u001b[0m\u001b[0;31m:\u001b[0m invalid syntax. Perhaps you forgot a comma?\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
